@@ -122,4 +122,4 @@ def fetch_documents():
 
 # Move the app.run to the end!
 if __name__ == '__main__':
-    app.run(debug=True, port=5000)
+    app.run(debug=True, host="13.232.231.213", port=5000)

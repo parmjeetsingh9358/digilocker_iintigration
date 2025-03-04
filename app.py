@@ -100,8 +100,19 @@ def callback():
     
     if response.status_code == 200:
         token_info = response.json()
+        
+        # ✅ Extracting and storing the necessary token details
         session["access_token"] = token_info.get("access_token")
-        return "✅ Authentication Successful! You can now fetch documents."
+        session["refresh_token"] = token_info.get("refresh_token")
+        session["digilocker_id"] = token_info.get("digilocker_id")
+        session["name"] = token_info.get("name")
+        session["eaadhar"] = token_info.get("eaadhar")
+        session["dob"] = token_info.get("dob")
+        session["gender"] = token_info.get("gender")
+        session["reference_key"] = token_info.get("reference_key")
+
+        print("Token Information Data:", token_info)
+        return jsonify(token_info)  # ✅ Return full token response as JSON
     else:
         return f"❌ Error: {response.text}", response.status_code
 

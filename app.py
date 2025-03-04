@@ -70,6 +70,9 @@ def callback():
     auth_code = request.args.get("code")
     received_state = request.args.get("state")
 
+    print(f"auth_code: {auth_code}")
+    print(f"received_state: {received_state}")
+
     # Validate received parameters
     if not auth_code:
         return "Error: Authorization failed! No code received.", 400
@@ -79,14 +82,14 @@ def callback():
         return "Error: Invalid state! Possible CSRF attack.", 400
 
     # Prepare token exchange request
-    token_data = {
+    token_data = {"Get access token using authorization code": {
         "grant_type": "authorization_code",  # Ensure correct grant type
         "code": auth_code,
         "client_id": CLIENT_ID,
         "client_secret": CLIENT_SECRET,
         "redirect_uri": REDIRECT_URI,
         "code_verifier": session.get("code_verifier")  # Include PKCE code_verifier
-    }
+    }}
 
     print("Token Request Data:", token_data)  # Debugging
 

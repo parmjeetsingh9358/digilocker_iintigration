@@ -81,21 +81,21 @@ def callback():
     if received_state != session.get("oauth_state"):
         return "Error: Invalid state! Possible CSRF attack.", 400
 
-    # Prepare token exchange request
-    token_data = {"Get access token using authorization code": {
-        "grant_type": "authorization_code",  # Ensure correct grant type
+    # ✅ Correct JSON Payload Format
+    token_data = {
+        "grant_type": "authorization_code",
         "code": auth_code,
         "client_id": CLIENT_ID,
         "client_secret": CLIENT_SECRET,
         "redirect_uri": REDIRECT_URI,
-        "code_verifier": session.get("code_verifier")  # Include PKCE code_verifier
-    }}
+        "code_verifier": session.get("code_verifier")
+    }
 
     print("Token Request Data:", token_data)  # Debugging
 
-    # Exchange authorization code for access token
-    response = requests.post(TOKEN_URL, data=token_data)
-    
+    # ✅ Use json= for correct request format
+    response = requests.post(TOKEN_URL, json=token_data)
+
     print(f"Token Response: {response.status_code}, {response.text}")  # Debugging
     
     if response.status_code == 200:

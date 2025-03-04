@@ -1,11 +1,11 @@
 import os
 
-CLIENT_ID = "LVA3A4468E"
-CLIENT_SECRET = "a627419383487a5faaff"
-REDIRECT_URI = "https://www.dpdpconsultants.com/digilocker/"
+CLIENT_ID = "VL558E2260"
+CLIENT_SECRET = "b635a872f2ce72667ea0"
+REDIRECT_URI = "https://testing.dpdp-privcy.in.net/callback"
 
-SETU_CLIENT_ID = "LVA3A4468E"
-SETU_CLIENT_SECRET = "a627419383487a5faaff"
+SETU_CLIENT_ID = "VL558E2260"
+SETU_CLIENT_SECRET = "b635a872f2ce72667ea0"
 SETU_PRODUCT_INSTANCE_ID = "891707ee-d6cd-4744-a28d-058829e30f10"
 
 AUTH_URL = "https://digilocker.meripehchaan.gov.in/public/oauth2/1/authorize"

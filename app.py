@@ -52,7 +52,7 @@ def login():
         "state": session["oauth_state"],
         "code_challenge": code_challenge,
         "code_challenge_method": "S256",
-        "scope": "avs_parent"
+        "scope": "avs_parent"  # Ensure "openid" is NOT included
     }
 
     auth_url = f"{AUTH_URL}?{urllib.parse.urlencode(params)}"
@@ -80,7 +80,7 @@ def callback():
 
     # Prepare token exchange request
     token_data = {
-        "grant_type": "authorization_code",
+        "grant_type": "authorization_code",  # Ensure correct grant type
         "code": auth_code,
         "client_id": CLIENT_ID,
         "client_secret": CLIENT_SECRET,
@@ -88,10 +88,12 @@ def callback():
         "code_verifier": session.get("code_verifier")  # Include PKCE code_verifier
     }
 
+    print("Token Request Data:", token_data)  # Debugging
+
     # Exchange authorization code for access token
     response = requests.post(TOKEN_URL, data=token_data)
     
-    print(f"Token Response: {response.text}")  # Debugging
+    print(f"Token Response: {response.status_code}, {response.text}")  # Debugging
     
     if response.status_code == 200:
         token_info = response.json()

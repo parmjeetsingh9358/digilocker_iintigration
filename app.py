@@ -111,10 +111,19 @@ def callback():
         session["gender"] = token_info.get("gender")
         session["reference_key"] = token_info.get("reference_key")
 
+        print("session Information Data:", session)
         print("Token Information Data:", token_info)
         return jsonify(token_info)  # ✅ Return full token response as JSON
     else:
         return f"❌ Error: {response.text}", response.status_code
+    
+
+# ✅ New Route to Print All Session Data for Debugging
+@app.route('/session-info')
+def session_info():
+    """Returns all stored session data for debugging"""
+    return jsonify(dict(session))
+
 
 # Step 3: Fetch User Documents from DigiLocker
 @app.route('/fetch-docs')

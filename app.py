@@ -83,7 +83,7 @@ def callback():
 
     # ✅ Correct JSON Payload Format
     token_data = {
-        "grant_type": "client_credentials",
+        "grant_type": "authorization_code",  # ✅ Correct grant type
         "code": auth_code,
         "client_id": CLIENT_ID,
         "client_secret": CLIENT_SECRET,
@@ -94,7 +94,7 @@ def callback():
     print("Token Request Data:", token_data)  # Debugging
 
     # ✅ Use json= for correct request format
-    response = requests.post(TOKEN_URL, json=token_data)
+    response = requests.post(TOKEN_URL, data=token_data)  # ✅ Use 'data=' instead of 'json='
 
     print(f"Token Response: {response.status_code}, {response.text}")  # Debugging
     

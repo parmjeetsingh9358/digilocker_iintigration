@@ -83,7 +83,7 @@ def callback():
 
     # ✅ Correct JSON Payload Format
     token_data = {
-        "grant_type": "authorization_code",
+        "grant_type": "client_credentials",
         "code": auth_code,
         "client_id": CLIENT_ID,
         "client_secret": CLIENT_SECRET,

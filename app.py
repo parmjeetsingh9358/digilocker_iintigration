@@ -53,7 +53,6 @@ def login():
             "redirect_uri": REDIRECT_URI,
             "state": session["oauth_state"],
         }
-    print=("{}?{}".format(AUTH_ENDPOINT, urllib.parse.urlencode(params)))
     # params = {
     #     "response_type": "code",
     #     "client_id": CLIENT_ID,
@@ -64,10 +63,13 @@ def login():
     #     "scope": "profile identity avs_partner"  # Add missing scopes
     # }
 
-    auth_url = f"{AUTH_URL}?{urllib.parse.urlencode(params)}"
-    print(f"Redirecting to Authorization URL: {auth_url}")  # Debugging
-    return "{}?{}".format(AUTH_ENDPOINT, urllib.parse.urlencode(params))
+    # auth_url = f"{AUTH_URL}?{urllib.parse.urlencode(params)}"
+    # print(f"Redirecting to Authorization URL: {auth_url}")  # Debugging
     # return redirect(auth_url)
+    auth_url = "{}?{}".format(AUTH_ENDPOINT, urllib.parse.urlencode(params))
+    print(f"Redirecting to Authorization URL: {auth_url}")  # ✅ Correct print statement
+
+    return redirect(auth_url)
 
 # Step 2: Handle Callback and Get Authorization Code
 @app.route('/callback')

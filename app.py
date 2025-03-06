@@ -45,7 +45,7 @@ def login():
     session["oauth_state"] = secrets.token_hex(16)
 
         # ✅ Use correct scope format
-    valid_scopes = "aadhaar profile"
+    valid_scopes = "avs_partner"
     encoded_scopes = urllib.parse.quote(valid_scopes)   
 
     # OAuth2 Authorization URL parameters

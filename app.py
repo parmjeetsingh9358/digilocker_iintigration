@@ -52,7 +52,7 @@ def login():
         "state": session["oauth_state"],
         "code_challenge": code_challenge,
         "code_challenge_method": "S256",
-        "scope": "profile aadhaar avs_parent digilocker_id"  # Add missing scopes
+        "scope": "profile aadhaar"  # Add missing scopes
     }
 
     auth_url = f"{AUTH_URL}?{urllib.parse.urlencode(params)}"

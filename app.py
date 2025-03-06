@@ -55,6 +55,7 @@ def login():
             "code_challenge": code_challenge,
             "code_challenge_method": "S256",
             "state": session["oauth_state"],
+            "scope": "avs_parent"
         }
     # params = {
     #     "response_type": "code",

@@ -65,6 +65,18 @@ def callback():
     """Step 2: Handle Callback and Exchange Authorization Code for Access Token"""
 
     print(f"Callback URL: {request.url}")
+    token_info = response.json()
+    print("Scopes in Token Response:", token_info.get("scope"))
+
+    required_scopes = {"profile", "identity", "avs_partner"}
+    token_scopes = set(token_info.get("scope", "").split())
+
+    if not required_scopes.issubset(token_scopes):
+        return jsonify({
+            "error": "Missing required scopes in access token!",
+            "granted_scopes": token_info.get("scope"),
+            "expected_scopes": "profile identity avs_partner"
+        }), 403
 
     auth_code = request.args.get("code")
     received_state = request.args.get("state")

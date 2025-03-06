@@ -109,6 +109,7 @@ def callback():
             "code": auth_code,
             "grant_type": "authorization_code",  # ✅ Correct grant type
             "client_id": CLIENT_ID,
+            "code_verifier": session.get("code_verifier"),
             "client_secret": CLIENT_SECRET,
             "redirect_uri": REDIRECT_URI
         }

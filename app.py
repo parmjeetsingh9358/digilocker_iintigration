@@ -25,7 +25,8 @@ CLIENT_ID = config.CLIENT_ID
 CLIENT_SECRET = config.CLIENT_SECRET
 REDIRECT_URI = config.REDIRECT_URI
 USER_INFO_URL = config.USER_INFO_URL
-AUTH_ENDPOINT = config.USER_INFO_URL
+AUTH_ENDPOINT = config.AUTH_ENDPOINT
+ACCESS_TOKEN_URL = config.ACCESS_TOKEN_URL
 
 @app.route('/')
 def home():
@@ -109,6 +110,7 @@ def callback():
             "client_secret": CLIENT_SECRET,
             "redirect_uri": REDIRECT_URI
         }
+    # return self.connection.make_request(ACCESS_TOKEN_URL, "POST", data=request_body)
 
     headers = {
         "Content-Type": "application/x-www-form-urlencoded",
@@ -118,7 +120,8 @@ def callback():
     print("Token Request Data:", token_data)  # Debugging
 
     # ✅ Use json= for correct request format
-    response = requests.post(TOKEN_URL, data=token_data, headers=headers)  # ✅ Use 'data=' instead of 'json='
+    
+    response = requests.post(ACCESS_TOKEN_URL, data=token_data)  # ✅ Use 'data=' instead of 'json='
 
     print(f"Token Response: {response.status_code}, {response.text}")  # Debugging
     

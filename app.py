@@ -60,7 +60,7 @@ def login():
 
     auth_url = f"{AUTH_URL}?{urllib.parse.urlencode(params)}"
     response = redirect(auth_url)
-    print(response.text, "response")
+    print(response, "response")
     print(f"Redirecting to Authorization URL: {auth_url}")  # Debugging
     return redirect(auth_url)
 

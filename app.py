@@ -56,7 +56,7 @@ def login():
         "state": session["oauth_state"],
         "code_challenge": code_challenge,
         "code_challenge_method": "S256",
-        "scope": valid_scopes  # Add missing scopes
+        "scope": "avs_parent"  # Add missing scopes
     }
 
     auth_url = f"{AUTH_URL}?{urllib.parse.urlencode(params)}"

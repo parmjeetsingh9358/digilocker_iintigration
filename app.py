@@ -85,10 +85,10 @@ def callback():
     token_data = {
         "grant_type": "authorization_code",  # ✅ Correct grant type
         "code": auth_code,
+        "redirect_uri": REDIRECT_URI,
+        "code_verifier": session.get("code_verifier"),
         "client_id": CLIENT_ID,
         "client_secret": CLIENT_SECRET,
-        "redirect_uri": REDIRECT_URI,
-        "code_verifier": session.get("code_verifier")
     }
 
     headers = {

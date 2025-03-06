@@ -47,14 +47,20 @@ def login():
 
     # OAuth2 Authorization URL parameters
     params = {
-        "response_type": "code",
-        "client_id": CLIENT_ID,
-        "redirect_uri": REDIRECT_URI,
-        "state": session["oauth_state"],
-        "code_challenge": code_challenge,
-        "code_challenge_method": "S256",
-        "scope": "profile identity avs_partner"  # Add missing scopes
-    }
+            "client_id": CLIENT_ID,
+            "response_type": "code",
+            "redirect_uri": REDIRECT_URI,
+            "state": session["oauth_state"],
+        }
+    # params = {
+    #     "response_type": "code",
+    #     "client_id": CLIENT_ID,
+    #     "redirect_uri": REDIRECT_URI,
+    #     "state": session["oauth_state"],
+    #     "code_challenge": code_challenge,
+    #     "code_challenge_method": "S256",
+    #     "scope": "profile identity avs_partner"  # Add missing scopes
+    # }
 
     auth_url = f"{AUTH_URL}?{urllib.parse.urlencode(params)}"
     print(f"Redirecting to Authorization URL: {auth_url}")  # Debugging
@@ -83,14 +89,21 @@ def callback():
         return "Error: Invalid state! Possible CSRF attack.", 400
 
     # ✅ Correct JSON Payload Format
+    # token_data = {
+    #     "grant_type": "authorization_code",  # ✅ Correct grant type
+    #     "code": auth_code,
+    #     "redirect_uri": REDIRECT_URI,
+    #     "code_verifier": session.get("code_verifier"),
+    #     "client_id": CLIENT_ID,
+    #     "client_secret": CLIENT_SECRET,
+    # }
     token_data = {
-        "grant_type": "authorization_code",  # ✅ Correct grant type
-        "code": auth_code,
-        "redirect_uri": REDIRECT_URI,
-        "code_verifier": session.get("code_verifier"),
-        "client_id": CLIENT_ID,
-        "client_secret": CLIENT_SECRET,
-    }
+            "code": auth_code,
+            "grant_type": "authorization_code",
+            "client_id": CLIENT_ID,
+            "client_secret": CLIENT_SECRET,
+            "redirect_uri": REDIRECT_URI
+        }
 
     headers = {
         "Content-Type": "application/x-www-form-urlencoded",

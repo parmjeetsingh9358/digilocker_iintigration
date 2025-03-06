@@ -45,7 +45,8 @@ def login():
     session["oauth_state"] = secrets.token_hex(16)
 
         # ✅ Use correct scope format
-    valid_scopes = "aadhaar profile"  # Add other necessary scopes
+    valid_scopes = "aadhaar profile"
+    encoded_scopes = urllib.parse.quote(valid_scopes)   
 
     # OAuth2 Authorization URL parameters
     params = {
@@ -55,7 +56,7 @@ def login():
         "state": session["oauth_state"],
         "code_challenge": code_challenge,
         "code_challenge_method": "S256",
-        "scope": valid_scopes  # Add missing scopes
+        "scope": encoded_scopes  # Add missing scopes
     }
 
     auth_url = f"{AUTH_URL}?{urllib.parse.urlencode(params)}"

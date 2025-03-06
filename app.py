@@ -52,6 +52,8 @@ def login():
             "client_id": CLIENT_ID,
             "response_type": "code",
             "redirect_uri": REDIRECT_URI,
+            "code_challenge": code_challenge,
+            "code_challenge_method": "S256",
             "state": session["oauth_state"],
         }
     # params = {
@@ -67,7 +69,7 @@ def login():
     # auth_url = f"{AUTH_URL}?{urllib.parse.urlencode(params)}"
     # print(f"Redirecting to Authorization URL: {auth_url}")  # Debugging
     # return redirect(auth_url)
-    auth_url = "{}?{}".format(AUTH_ENDPOINT, urllib.parse.urlencode(params))
+    auth_url = f"{AUTH_ENDPOINT}?{urllib.parse.urlencode(params)}"
     print(f"Redirecting to Authorization URL: {auth_url}")  # ✅ Correct print statement
 
     return redirect(auth_url)
@@ -78,7 +80,6 @@ def callback():
     """Step 2: Handle Callback and Exchange Authorization Code for Access Token"""
 
     print(f"Callback URL: {request.url}")  # Debugging
-    print(request.args, "== request.args ==")
 
     auth_code = request.args.get("code")
     received_state = request.args.get("state")

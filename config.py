@@ -11,7 +11,7 @@ SETU_PRODUCT_INSTANCE_ID = "891707ee-d6cd-4744-a28d-058829e30f10"
 AUTH_URL = "https://digilocker.meripehchaan.gov.in/public/oauth2/1/authorize"
 TOKEN_URL = "https://digilocker.meripehchaan.gov.in/public/oauth2/1/token"
 DOCS_URL = "https://digilocker.meripehchaan.gov.in/public/oauth2/1/files"
-USER_INFO_URL = "https://api.digilocker.gov.in/public/userinfo"
+USER_INFO_URL = "https://digilocker.meripehchaan.gov.in/public/oauth2/1/user"
 
 
 # Flask App Settings

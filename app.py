@@ -119,6 +119,7 @@ def callback():
 
         user_data = fetch_user_info(session["access_token"])
 
+        print("User Information Data:", user_data)
         print("session Information Data:", session)
         print("Token Information Data:", token_info)
         print(jsonify(dict(session)))
@@ -136,7 +137,6 @@ def fetch_user_info(access_token):
         "Authorization": f"Bearer {access_token}",
         "Accept": "application/json"
     }
-
     response = requests.get(USER_INFO_URL, headers=headers)
 
     print(f"User Info Response: {response.status_code}, {response.text}")  # Debugging

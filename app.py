@@ -79,23 +79,34 @@ def callback():
     if received_state != session.get("oauth_state"):
         return "Error: Invalid state! Possible CSRF attack.", 400
 
+    # token_data = {
+    #         "code": auth_code,
+    #         "grant_type": "authorization_code",
+    #         "client_id": CLIENT_ID,
+    #         "code_verifier": session.get("code_verifier"),
+    #         "client_secret": CLIENT_SECRET,
+    #         "redirect_uri": REDIRECT_URI
+    #     }
     token_data = {
-            "code": auth_code,
-            "grant_type": "authorization_code",
-            "client_id": CLIENT_ID,
-            "code_verifier": session.get("code_verifier"),
-            "client_secret": CLIENT_SECRET,
-            "redirect_uri": REDIRECT_URI
-        }
+        "code": auth_code,
+        "grant_type": "authorization_code",
+        "client_id": CLIENT_ID,
+        "client_secret": CLIENT_SECRET,
+        "redirect_uri": REDIRECT_URI
+    }
+
 
     print("Token Request Data:", token_data)
     
     response = requests.post(ACCESS_TOKEN_URL, data=token_data)
 
-    print(f"Token Response: {response.status_code}, {response.text}")
+    print(f"🔹 Token Response Status: {response.status_code}")
+    print(f"🔹 Token Response Data: {response.text}")
+
     
     if response.status_code == 200:
         token_info = response.json()
+        print("🔹 Granted Scopes:", token_info.get("scope"))
         
         session["access_token"] = token_info.get("access_token")
         session["refresh_token"] = token_info.get("refresh_token")
@@ -105,7 +116,6 @@ def callback():
         session["dob"] = token_info.get("dob")
         session["gender"] = token_info.get("gender")
         session["reference_key"] = token_info.get("reference_key")
-
         user_data = fetch_user_info(session["access_token"])
 
         print("User Information Data:", user_data)

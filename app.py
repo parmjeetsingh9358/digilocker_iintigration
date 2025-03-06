@@ -107,7 +107,7 @@ def callback():
     # }
     token_data = {
             "code": auth_code,
-            "grant_type": "authorization_code",
+            "grant_type": "authorization_code",  # ✅ Correct grant type
             "client_id": CLIENT_ID,
             "client_secret": CLIENT_SECRET,
             "redirect_uri": REDIRECT_URI

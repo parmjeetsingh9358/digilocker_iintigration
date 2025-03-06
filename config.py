@@ -13,6 +13,9 @@ TOKEN_URL = "https://digilocker.meripehchaan.gov.in/public/oauth2/1/token"
 DOCS_URL = "https://digilocker.meripehchaan.gov.in/public/oauth2/1/files"
 USER_INFO_URL = "https://digilocker.meripehchaan.gov.in/public/oauth2/1/user"
 
+BASE_URL = "https://api.digitallocker.gov.in/public/oauth2/1"
+
+AUTH_ENDPOINT = "{}/authorize".format(BASE_URL)
 
 # Flask App Settings
 SECRET_KEY = os.urandom(24)

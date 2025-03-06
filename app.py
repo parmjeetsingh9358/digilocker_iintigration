@@ -25,6 +25,7 @@ CLIENT_ID = config.CLIENT_ID
 CLIENT_SECRET = config.CLIENT_SECRET
 REDIRECT_URI = config.REDIRECT_URI
 USER_INFO_URL = config.USER_INFO_URL
+AUTH_ENDPOINT = config.USER_INFO_URL
 
 @app.route('/')
 def home():
@@ -52,6 +53,7 @@ def login():
             "redirect_uri": REDIRECT_URI,
             "state": session["oauth_state"],
         }
+    print=("{}?{}".format(AUTH_ENDPOINT, urllib.parse.urlencode(params)))
     # params = {
     #     "response_type": "code",
     #     "client_id": CLIENT_ID,
@@ -64,7 +66,8 @@ def login():
 
     auth_url = f"{AUTH_URL}?{urllib.parse.urlencode(params)}"
     print(f"Redirecting to Authorization URL: {auth_url}")  # Debugging
-    return redirect(auth_url)
+    return "{}?{}".format(AUTH_ENDPOINT, urllib.parse.urlencode(params))
+    # return redirect(auth_url)
 
 # Step 2: Handle Callback and Get Authorization Code
 @app.route('/callback')

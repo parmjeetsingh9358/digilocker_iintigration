@@ -52,7 +52,7 @@ def login():
         "state": session["oauth_state"],
         "code_challenge": code_challenge,
         "code_challenge_method": "S256",
-        "scope": "avs_parent"  # Ensure "openid" is NOT included
+        "scope": "avs_parent"
     }
 
     auth_url = f"{AUTH_URL}?{urllib.parse.urlencode(params)}"
@@ -113,7 +113,11 @@ def callback():
 
         print("session Information Data:", session)
         print("Token Information Data:", token_info)
-        return jsonify(token_info)  # ✅ Return full token response as JSON
+        print(jsonify(dict(session)))
+        return jsonify({
+            "session_data": dict(session),  # Convert session object to dictionary
+            "token_info": token_info
+        })  # ✅ Return full token response as JSON
     else:
         return f"❌ Error: {response.text}", response.status_code
     

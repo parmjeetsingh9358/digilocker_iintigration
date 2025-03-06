@@ -91,10 +91,15 @@ def callback():
         "code_verifier": session.get("code_verifier")
     }
 
+    headers = {
+        "Content-Type": "application/x-www-form-urlencoded",
+        "Accept": "application/json"
+    }
+
     print("Token Request Data:", token_data)  # Debugging
 
     # ✅ Use json= for correct request format
-    response = requests.post(TOKEN_URL, data=token_data)  # ✅ Use 'data=' instead of 'json='
+    response = requests.post(TOKEN_URL, data=token_data, headers=headers)  # ✅ Use 'data=' instead of 'json='
 
     print(f"Token Response: {response.status_code}, {response.text}")  # Debugging
     

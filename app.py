@@ -37,17 +37,14 @@ def home():
 def login():
     """Step 1: Redirect User to DigiLocker for Authentication"""
 
-    # Generate PKCE (Proof Key for Code Exchange)
     code_verifier = secrets.token_urlsafe(64)
     code_challenge = base64.urlsafe_b64encode(
         hashlib.sha256(code_verifier.encode()).digest()
     ).decode().rstrip("=")
 
-    # Store code_verifier and state in session
     session["code_verifier"] = code_verifier
     session["oauth_state"] = secrets.token_hex(16)  
 
-    # OAuth2 Authorization URL parameters
     params = {
             "client_id": CLIENT_ID,
             "response_type": "code",
@@ -57,21 +54,8 @@ def login():
             "state": session["oauth_state"],
             "scope": "avs_parent"
         }
-    # params = {
-    #     "response_type": "code",
-    #     "client_id": CLIENT_ID,
-    #     "redirect_uri": REDIRECT_URI,
-    #     "state": session["oauth_state"],
-    #     "code_challenge": code_challenge,
-    #     "code_challenge_method": "S256",
-    #     "scope": "profile identity avs_partner"  # Add missing scopes
-    # }
-
-    # auth_url = f"{AUTH_URL}?{urllib.parse.urlencode(params)}"
-    # print(f"Redirecting to Authorization URL: {auth_url}")  # Debugging
-    # return redirect(auth_url)
     auth_url = f"{AUTH_ENDPOINT}?{urllib.parse.urlencode(params)}"
-    print(f"Redirecting to Authorization URL: {auth_url}")  # ✅ Correct print statement
+    print(f"Redirecting to Authorization URL: {auth_url}")
 
     return redirect(auth_url)
 
@@ -80,7 +64,7 @@ def login():
 def callback():
     """Step 2: Handle Callback and Exchange Authorization Code for Access Token"""
 
-    print(f"Callback URL: {request.url}")  # Debugging
+    print(f"Callback URL: {request.url}")
 
     auth_code = request.args.get("code")
     received_state = request.args.get("state")
@@ -88,7 +72,6 @@ def callback():
     print(f"auth_code: {auth_code}")
     print(f"received_state: {received_state}")
 
-    # Validate received parameters
     if not auth_code:
         return "Error: Authorization failed! No code received.", 400
     if not received_state:
@@ -96,42 +79,30 @@ def callback():
     if received_state != session.get("oauth_state"):
         return "Error: Invalid state! Possible CSRF attack.", 400
 
-    # ✅ Correct JSON Payload Format
-    # token_data = {
-    #     "grant_type": "authorization_code",  # ✅ Correct grant type
-    #     "code": auth_code,
-    #     "redirect_uri": REDIRECT_URI,
-    #     "code_verifier": session.get("code_verifier"),
-    #     "client_id": CLIENT_ID,
-    #     "client_secret": CLIENT_SECRET,
-    # }
     token_data = {
             "code": auth_code,
-            "grant_type": "authorization_code",  # ✅ Correct grant type
+            "grant_type": "authorization_code",
             "client_id": CLIENT_ID,
             "code_verifier": session.get("code_verifier"),
             "client_secret": CLIENT_SECRET,
             "redirect_uri": REDIRECT_URI
         }
-    # return self.connection.make_request(ACCESS_TOKEN_URL, "POST", data=request_body)
 
     headers = {
         "Content-Type": "application/x-www-form-urlencoded",
         "Accept": "application/json"
     }
 
-    print("Token Request Data:", token_data)  # Debugging
+    print("Token Request Data:", token_data)
 
-    # ✅ Use json= for correct request format
     
-    response = requests.post(ACCESS_TOKEN_URL, data=token_data)  # ✅ Use 'data=' instead of 'json='
+    response = requests.post(ACCESS_TOKEN_URL, data=token_data)
 
-    print(f"Token Response: {response.status_code}, {response.text}")  # Debugging
+    print(f"Token Response: {response.status_code}, {response.text}")
     
     if response.status_code == 200:
         token_info = response.json()
         
-        # ✅ Extracting and storing the necessary token details
         session["access_token"] = token_info.get("access_token")
         session["refresh_token"] = token_info.get("refresh_token")
         session["digilocker_id"] = token_info.get("digilocker_id")
@@ -148,9 +119,9 @@ def callback():
         print("Token Information Data:", token_info)
         print(jsonify(dict(session)))
         return jsonify({
-            "session_data": dict(session),  # Convert session object to dictionary
+            "session_data": dict(session),
             "token_info": token_info
-        })  # ✅ Return full token response as JSON
+        })
     else:
         return f"❌ Error: {response.text}", response.status_code
     
@@ -163,20 +134,13 @@ def fetch_user_info(access_token):
     }
     response = requests.get(USER_INFO_URL, headers=headers)
 
-    print(f"User Info Response: {response.status_code}, {response.text}")  # Debugging
+    print(f"User Info Response: {response.status_code}, {response.text}")
 
     if response.status_code == 200:
-        return response.json()  # ✅ Return user details
+        return response.json()
     else:
         return {"error": f"Failed to fetch user data: {response.text}"}
     
-
-# ✅ New Route to Print All Session Data for Debugging
-@app.route('/session-info')
-def session_info():
-    """Returns all stored session data for debugging"""
-    return jsonify(dict(session))
-
 
 # Step 3: Fetch User Documents from DigiLocker
 @app.route('/fetch-docs')

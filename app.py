@@ -52,7 +52,7 @@ def login():
             "code_challenge": code_challenge,
             "code_challenge_method": "S256",
             "state": session["oauth_state"],
-            "scope": "avs_parent"
+            "scope": "aadhaar avs_partner digilockerid",
         }
     auth_url = f"{AUTH_ENDPOINT}?{urllib.parse.urlencode(params)}"
     print(f"Redirecting to Authorization URL: {auth_url}")
@@ -79,18 +79,12 @@ def callback():
     if received_state != session.get("oauth_state"):
         return "Error: Invalid state! Possible CSRF attack.", 400
 
-    # token_data = {
-    #         "code": auth_code,
-    #         "grant_type": "authorization_code",
-    #         "client_id": CLIENT_ID,
-    #         "code_verifier": session.get("code_verifier"),
-    #         "client_secret": CLIENT_SECRET,
-    #         "redirect_uri": REDIRECT_URI
-    #     }
+
     token_data = {
         "code": auth_code,
         "grant_type": "authorization_code",
         "client_id": CLIENT_ID,
+        "code_verifier": session.get("code_verifier"),
         "client_secret": CLIENT_SECRET,
         "redirect_uri": REDIRECT_URI
     }

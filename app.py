@@ -24,6 +24,7 @@ DOCS_URL = config.DOCS_URL
 CLIENT_ID = config.CLIENT_ID
 CLIENT_SECRET = config.CLIENT_SECRET
 REDIRECT_URI = config.REDIRECT_URI
+USER_INFO_URL = config.USER_INFO_URL
 
 @app.route('/')
 def home():
@@ -42,11 +43,7 @@ def login():
 
     # Store code_verifier and state in session
     session["code_verifier"] = code_verifier
-    session["oauth_state"] = secrets.token_hex(16)
-
-        # ✅ Use correct scope format
-    valid_scopes = "avs_partner"
-    encoded_scopes = urllib.parse.quote(valid_scopes)   
+    session["oauth_state"] = secrets.token_hex(16)  
 
     # OAuth2 Authorization URL parameters
     params = {
@@ -120,6 +117,8 @@ def callback():
         session["gender"] = token_info.get("gender")
         session["reference_key"] = token_info.get("reference_key")
 
+        user_data = fetch_user_info(session["access_token"])
+
         print("session Information Data:", session)
         print("Token Information Data:", token_info)
         print(jsonify(dict(session)))
@@ -129,6 +128,23 @@ def callback():
         })  # ✅ Return full token response as JSON
     else:
         return f"❌ Error: {response.text}", response.status_code
+    
+    
+def fetch_user_info(access_token):
+    """Fetch user details from DigiLocker using access token"""
+    headers = {
+        "Authorization": f"Bearer {access_token}",
+        "Accept": "application/json"
+    }
+
+    response = requests.get(USER_INFO_URL, headers=headers)
+
+    print(f"User Info Response: {response.status_code}, {response.text}")  # Debugging
+
+    if response.status_code == 200:
+        return response.json()  # ✅ Return user details
+    else:
+        return {"error": f"Failed to fetch user data: {response.text}"}
     
 
 # ✅ New Route to Print All Session Data for Debugging

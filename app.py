@@ -56,11 +56,10 @@ def login():
         "state": session["oauth_state"],
         "code_challenge": code_challenge,
         "code_challenge_method": "S256",
+        "scope": "avs_parent"  # Add missing scopes
     }
 
     auth_url = f"{AUTH_URL}?{urllib.parse.urlencode(params)}"
-    response = redirect(auth_url)
-    print(response, "response")
     print(f"Redirecting to Authorization URL: {auth_url}")  # Debugging
     return redirect(auth_url)
 

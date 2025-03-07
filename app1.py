@@ -24,10 +24,12 @@ REDIRECT_URI = os.getenv("REDIRECT_URI", "https://testing.dpdp-privcy.in.net/cal
 def generate_code_challenge():
     """Generate a secure PKCE code challenge and code verifier"""
     code_verifier = secrets.token_urlsafe(64)
+    session["code_verifier"] = code_verifier 
+
     code_challenge = base64.urlsafe_b64encode(
         hashlib.sha256(code_verifier.encode()).digest()
     ).decode().rstrip("=")
-    session["code_verifier"] = code_verifier  # Store in session
+
     return code_challenge
 
 @app.route("/authorize", methods=["GET"])
@@ -50,13 +52,18 @@ def callback():
     auth_code = request.args.get("code")  # Get the authorization code
     state = request.args.get("state")  # Get the state parameter
 
-    # Check if the auth_code exists
+    # Check if auth_code exists
     if not auth_code:
         return jsonify({"error": "Missing authorization code"}), 400
 
     # Validate the state parameter
     if state != session.get("oauth_state"):
         return jsonify({"error": "Invalid state parameter"}), 400
+
+    # Retrieve code_verifier from session
+    code_verifier = session.get("code_verifier")
+    if not code_verifier:
+        return jsonify({"error": "Missing code_verifier"}), 400
 
     token_url = f"{BASE_URL}/token"
 
@@ -65,7 +72,8 @@ def callback():
         "client_id": CLIENT_ID,
         "client_secret": CLIENT_SECRET,
         "redirect_uri": REDIRECT_URI,
-        "grant_type": "authorization_code"
+        "grant_type": "authorization_code",
+        "code_verifier": code_verifier
     }
 
     headers = {"Content-Type": "application/x-www-form-urlencoded"}
@@ -76,11 +84,10 @@ def callback():
         bearer_token = token_data.get("access_token")
 
         if bearer_token:
-            os.environ["BEARER_TOKEN"] = bearer_token
+            session["BEARER_TOKEN"] = bearer_token  # Store in session
             return jsonify({"message": "Bearer token generated successfully", "bearer_token": bearer_token})
 
     return jsonify({"error": "Failed to fetch Bearer Token", "details": response.text}), 400
-
 
 def get_bearer_token():
     """Fetch stored Bearer Token"""

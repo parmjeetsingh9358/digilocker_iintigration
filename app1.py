@@ -66,30 +66,107 @@ def callback():
 
     token_url = f"{BASE_URL}/token"
     payload = {
-        "code": auth_code,
-        "client_id": CLIENT_ID,
-        "redirect_uri": REDIRECT_URI,
         "grant_type": "authorization_code",
-        "code_verifier": code_verifier
+        "code": auth_code,
+        "redirect_uri": REDIRECT_URI,
+        "code_verifier": code_verifier,
+        "client_id": CLIENT_ID,
+        "client_secret": CLIENT_SECRET
     }
 
-    headers = {"Content-Type": "application/x-www-form-urlencoded"}
-    response = requests.post(token_url, data=payload, headers=headers)
+    headers = {"Content-Type": "application/json"}
+    response = requests.post(token_url, json=payload, headers=headers)
 
     if response.status_code == 200:
         token_data = response.json()
         bearer_token = token_data.get("access_token")
+        refresh_token = token_data.get("refresh_token")
         granted_scopes = token_data.get("scope")  # Check granted scopes
 
         if bearer_token:
-            session["BEARER_TOKEN"] = bearer_token  # Store in session
+            session["BEARER_TOKEN"] = bearer_token  # Store access token in session
+            session["REFRESH_TOKEN"] = refresh_token  # Store refresh token
+
             return jsonify({
                 "message": "Bearer token generated successfully",
                 "bearer_token": bearer_token,
+                "refresh_token": refresh_token,
                 "granted_scopes": granted_scopes
             })
 
     return jsonify({"error": "Failed to fetch Bearer Token", "details": response.text}), 400
+
+
+@app.route("/refresh_token", methods=["POST"])
+def refresh_access_token():
+    """Refresh the access token using the refresh token"""
+    refresh_token = session.get("REFRESH_TOKEN")
+
+    if not refresh_token:
+        return jsonify({"error": "Refresh token not found"}), 401
+
+    token_url = f"{BASE_URL}/token"
+    payload = {
+        "grant_type": "refresh_token",
+        "refresh_token": refresh_token,
+        "client_id": CLIENT_ID,
+        "client_secret": CLIENT_SECRET
+    }
+
+    headers = {"Content-Type": "application/json"}
+    response = requests.post(token_url, json=payload, headers=headers)
+
+    if response.status_code == 200:
+        token_data = response.json()
+        new_access_token = token_data.get("access_token")
+        new_refresh_token = token_data.get("refresh_token")  # Update refresh token
+
+        session["BEARER_TOKEN"] = new_access_token
+        session["REFRESH_TOKEN"] = new_refresh_token
+
+        return jsonify({
+            "message": "Access token refreshed successfully",
+            "bearer_token": new_access_token,
+            "refresh_token": new_refresh_token
+        })
+
+    return jsonify({"error": "Failed to refresh access token", "details": response.text}), 400
+
+
+@app.route("/device_auth", methods=["POST"])
+def get_token_using_device_code():
+    """Obtain an access token using a device code and OTP"""
+    data = request.json
+    device_code = data.get("device_code")
+    dl_otp = data.get("dl_otp")
+
+    if not device_code or not dl_otp:
+        return jsonify({"error": "Missing device_code or dl_otp"}), 400
+
+    token_url = f"{BASE_URL}/token"
+    payload = {
+        "client_id": CLIENT_ID,
+        "grant_type": "urn:ietf:params:oauth:grant-type:device_code",
+        "device_code": device_code,
+        "dl_otp": dl_otp
+    }
+
+    headers = {"Content-Type": "application/json"}
+    response = requests.post(token_url, json=payload, headers=headers)
+
+    if response.status_code == 200:
+        token_data = response.json()
+        bearer_token = token_data.get("access_token")
+
+        if bearer_token:
+            session["BEARER_TOKEN"] = bearer_token  # Store access token in session
+            return jsonify({
+                "message": "Bearer token generated successfully",
+                "bearer_token": bearer_token
+            })
+
+    return jsonify({"error": "Failed to obtain access token via device code", "details": response.text}), 400
+
 
 @app.route("/get_user_info", methods=["GET"])
 def get_user_info():

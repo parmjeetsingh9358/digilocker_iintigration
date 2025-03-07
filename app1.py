@@ -42,31 +42,28 @@ def authorize():
         f"{BASE_URL}/authorize?client_id={CLIENT_ID}&response_type=code"
         f"&redirect_uri={REDIRECT_URI}&state={session['oauth_state']}"
         f"&code_challenge={code_challenge}&code_challenge_method=S256"
-        f"&scope=avs"
+        f"&scope=profile avs documents sign verification"  # ✅ Request multiple scopes
     )
     return redirect(auth_url)
+
 
 @app.route("/callback", methods=["GET"])
 def callback():
     """Handles DigiLocker OAuth callback and fetches the Bearer Token"""
-    auth_code = request.args.get("code")  # Get the authorization code
-    state = request.args.get("state")  # Get the state parameter
+    auth_code = request.args.get("code")
+    state = request.args.get("state")
 
-    # Check if auth_code exists
     if not auth_code:
         return jsonify({"error": "Missing authorization code"}), 400
 
-    # Validate the state parameter
     if state != session.get("oauth_state"):
         return jsonify({"error": "Invalid state parameter"}), 400
 
-    # Retrieve code_verifier from session
     code_verifier = session.get("code_verifier")
     if not code_verifier:
         return jsonify({"error": "Missing code_verifier"}), 400
 
     token_url = f"{BASE_URL}/token"
-
     payload = {
         "code": auth_code,
         "client_id": CLIENT_ID,
@@ -82,12 +79,18 @@ def callback():
     if response.status_code == 200:
         token_data = response.json()
         bearer_token = token_data.get("access_token")
+        granted_scopes = token_data.get("scope")  # 🔍 Check what scopes were granted
 
         if bearer_token:
             session["BEARER_TOKEN"] = bearer_token  # Store in session
-            return jsonify({"message": "Bearer token generated successfully", "bearer_token": bearer_token})
+            return jsonify({
+                "message": "Bearer token generated successfully",
+                "bearer_token": bearer_token,
+                "granted_scopes": granted_scopes  # ✅ Return granted scopes
+            })
 
     return jsonify({"error": "Failed to fetch Bearer Token", "details": response.text}), 400
+
 
 def get_bearer_token():
     """Fetch stored Bearer Token"""

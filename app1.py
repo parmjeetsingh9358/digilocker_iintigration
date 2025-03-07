@@ -38,7 +38,7 @@ def authorize():
     code_challenge = generate_code_challenge()
 
     auth_url = (
-        f"{BASE_URL}/authorize?client_id={CLIENT_ID}&response_type=code"
+        f"{BASE_URL}/authorize?client_id=HMBAEBFEE0&response_type=code"
         f"&redirect_uri={REDIRECT_URI}&state={session['oauth_state']}"
         f"&code_challenge={code_challenge}&code_challenge_method=S256"
         f"&scope=avs_parent"  # Request multiple scopes

@@ -46,21 +46,26 @@ def authorize():
 
 @app.route("/callback", methods=["GET"])
 def callback():
-    """Handles OAuth callback & exchanges auth code for Bearer Token"""
-    auth_code = request.args.get("code")
-    state = request.args.get("state")
+    """Handles DigiLocker OAuth callback and fetches the Bearer Token"""
+    auth_code = request.args.get("code")  # Get the authorization code
+    state = request.args.get("state")  # Get the state parameter
 
-    if not auth_code or state != session.get("oauth_state"):
-        return jsonify({"error": "Invalid or missing authorization code/state"}), 400
+    # Check if the auth_code exists
+    if not auth_code:
+        return jsonify({"error": "Missing authorization code"}), 400
+
+    # Validate the state parameter
+    if state != session.get("oauth_state"):
+        return jsonify({"error": "Invalid state parameter"}), 400
 
     token_url = f"{BASE_URL}/token"
+
     payload = {
         "code": auth_code,
         "client_id": CLIENT_ID,
         "client_secret": CLIENT_SECRET,
         "redirect_uri": REDIRECT_URI,
-        "grant_type": "authorization_code",
-        "code_verifier": session.get("code_verifier")
+        "grant_type": "authorization_code"
     }
 
     headers = {"Content-Type": "application/x-www-form-urlencoded"}
@@ -68,10 +73,14 @@ def callback():
 
     if response.status_code == 200:
         token_data = response.json()
-        session["BEARER_TOKEN"] = token_data.get("access_token")
-        return jsonify({"message": "Bearer token stored", "token": session["BEARER_TOKEN"]})
+        bearer_token = token_data.get("access_token")
 
-    return jsonify({"error": "Failed to get Bearer Token", "details": response.text}), 400
+        if bearer_token:
+            os.environ["BEARER_TOKEN"] = bearer_token
+            return jsonify({"message": "Bearer token generated successfully", "bearer_token": bearer_token})
+
+    return jsonify({"error": "Failed to fetch Bearer Token", "details": response.text}), 400
+
 
 def get_bearer_token():
     """Fetch stored Bearer Token"""

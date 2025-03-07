@@ -41,7 +41,7 @@ def authorize():
         f"{BASE_URL}/authorize?client_id={CLIENT_ID}&response_type=code"
         f"&redirect_uri={REDIRECT_URI}&state={session['oauth_state']}"
         f"&code_challenge={code_challenge}&code_challenge_method=S256"
-        f"&scope=profile avs documents sign verification"  # Request multiple scopes
+        f"&scope=avs_parent"  # Request multiple scopes
         f"&dl_flow=consent"
         f"&Verified_mobile=7830508718"  # Replace with actual verified mobile if required
     )

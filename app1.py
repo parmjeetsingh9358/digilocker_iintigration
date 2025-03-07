@@ -16,9 +16,9 @@ app.secret_key = os.getenv("SECRET_KEY", "supersecretkey")  # Set Flask session 
 BASE_URL = "https://digilocker.meripehchaan.gov.in/public/oauth2/1"
 
 # API Credentials (From .env)
-CLIENT_ID = os.getenv("CLIENT_ID", "HMBAEBFEE0")
-CLIENT_SECRET = os.getenv("CLIENT_SECRET", "b48dd4cbb56a06cb2e03")
-REDIRECT_URI = os.getenv("REDIRECT_URI", "https://testing.dpdp-privcy.in.net/callback")
+CLIENT_ID = "HMBAEBFEE0"
+CLIENT_SECRET = "b48dd4cbb56a06cb2e03"
+REDIRECT_URI = "https://testing.dpdp-privcy.in.net/callback"
 
 def generate_code_challenge():
     """Generate a secure PKCE code challenge and code verifier"""

@@ -1,13 +1,12 @@
 from flask import Flask, request, jsonify, redirect, session
 import requests
 import os
-import json
 import secrets
 import base64
 import hashlib
 from dotenv import load_dotenv
 
-# Load environment variables from .env file
+# Load environment variables
 load_dotenv()
 
 app = Flask(__name__)
@@ -24,17 +23,17 @@ REDIRECT_URI = os.getenv("REDIRECT_URI", "https://testing.dpdp-privcy.in.net/cal
 def generate_code_challenge():
     """Generate a secure PKCE code challenge and code verifier"""
     code_verifier = secrets.token_urlsafe(64)
-    session["code_verifier"] = code_verifier 
+    session["code_verifier"] = code_verifier  # Store in session for later token exchange
 
     code_challenge = base64.urlsafe_b64encode(
         hashlib.sha256(code_verifier.encode()).digest()
-    ).decode().rstrip("=")
+    ).decode().rstrip("=")  # Remove padding
 
     return code_challenge
 
 @app.route("/authorize", methods=["GET"])
 def authorize():
-    """Initiates OAuth 2.0 flow with PKCE"""
+    """Initiates OAuth 2.0 flow and redirects user to DigiLocker"""
     session["oauth_state"] = secrets.token_hex(16)  # CSRF protection
     code_challenge = generate_code_challenge()
 
@@ -42,10 +41,12 @@ def authorize():
         f"{BASE_URL}/authorize?client_id={CLIENT_ID}&response_type=code"
         f"&redirect_uri={REDIRECT_URI}&state={session['oauth_state']}"
         f"&code_challenge={code_challenge}&code_challenge_method=S256"
-        f"&scope=profile avs documents sign verification"  # ✅ Request multiple scopes
+        f"&scope=profile avs documents sign verification"  # Request multiple scopes
+        f"&dl_flow=consent"
+        f"&Verified_mobile=7830508718"  # Replace with actual verified mobile if required
     )
-    return redirect(auth_url)
 
+    return redirect(auth_url)
 
 @app.route("/callback", methods=["GET"])
 def callback():
@@ -53,9 +54,9 @@ def callback():
     auth_code = request.args.get("code")
     state = request.args.get("state")
 
+    # Validate the authorization code and state
     if not auth_code:
         return jsonify({"error": "Missing authorization code"}), 400
-
     if state != session.get("oauth_state"):
         return jsonify({"error": "Invalid state parameter"}), 400
 
@@ -67,7 +68,6 @@ def callback():
     payload = {
         "code": auth_code,
         "client_id": CLIENT_ID,
-        "client_secret": CLIENT_SECRET,
         "redirect_uri": REDIRECT_URI,
         "grant_type": "authorization_code",
         "code_verifier": code_verifier
@@ -79,40 +79,32 @@ def callback():
     if response.status_code == 200:
         token_data = response.json()
         bearer_token = token_data.get("access_token")
-        granted_scopes = token_data.get("scope")  # 🔍 Check what scopes were granted
+        granted_scopes = token_data.get("scope")  # Check granted scopes
 
         if bearer_token:
             session["BEARER_TOKEN"] = bearer_token  # Store in session
             return jsonify({
                 "message": "Bearer token generated successfully",
                 "bearer_token": bearer_token,
-                "granted_scopes": granted_scopes  # ✅ Return granted scopes
+                "granted_scopes": granted_scopes
             })
 
     return jsonify({"error": "Failed to fetch Bearer Token", "details": response.text}), 400
 
-
-def get_bearer_token():
-    """Fetch stored Bearer Token"""
-    return session.get("BEARER_TOKEN", "your_bearer_token")
-
-def make_request(endpoint):
-    """Helper function to make API requests with Bearer Token"""
-    bearer_token = get_bearer_token()
-    if bearer_token == "your_bearer_token":
-        return {"error": "Bearer Token not found"}, 401
-
-    headers = {"Authorization": f"Bearer {bearer_token}"}
-    response = requests.get(f"{BASE_URL}{endpoint}", headers=headers)
-
-    if response.status_code == 200:
-        return response.json(), 200
-    return {"error": "Request failed", "details": response.text}, response.status_code
-
 @app.route("/get_user_info", methods=["GET"])
 def get_user_info():
     """Fetch user information from DigiLocker"""
-    return jsonify(make_request("/user"))
+    bearer_token = session.get("BEARER_TOKEN")
+    if not bearer_token:
+        return jsonify({"error": "Bearer Token not found"}), 401
+
+    headers = {"Authorization": f"Bearer {bearer_token}"}
+    response = requests.get(f"{BASE_URL}/user", headers=headers)
+
+    if response.status_code == 200:
+        return jsonify(response.json())
+    
+    return jsonify({"error": "Request failed", "details": response.text}), response.status_code
 
 if __name__ == "__main__":
     app.run(debug=True)

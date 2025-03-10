@@ -82,6 +82,27 @@ def get_token():
 
     return jsonify(response.json())
 
+@app.route("/callback", methods=["GET"])
+def callback():
+    """Handle DigiLocker OAuth2 callback."""
+    code = request.args.get("code")
+    state = request.args.get("state")
+
+    if not code:
+        return jsonify({"error": "Authorization code missing"}), 400
+
+    # Retrieve stored state from session (for validation)
+    stored_state = session.get("state")
+    if state != stored_state:
+        return jsonify({"error": "Invalid state parameter"}), 400
+
+    # Store authorization code in session (optional)
+    session["auth_code"] = code
+
+    # Proceed to token exchange
+    return jsonify({"message": "Authorization successful", "code": code})
+
+
 @app.route("/fetch-documents", methods=["GET"])
 def fetch_documents():
     """Fetch user's documents from DigiLocker."""

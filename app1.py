@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, session
 import requests
 import config
 
@@ -12,8 +12,10 @@ BASE_URL = "https://digilocker.gov.in/public/oauth2"
 
 @app.route("/auth", methods=["GET"])
 def authenticate():
+    state = session.get("state", "default_state")  # Retrieve from session
+    print(state, "=== state ===")
     """Initiate DigiLocker Authentication."""
-    auth_url = f"{BASE_URL}/authorize?response_type=code&client_id={CLIENT_ID}&redirect_uri={REDIRECT_URI}&state=xyz"
+    auth_url = f"{BASE_URL}/authorize?response_type=code&client_id={CLIENT_ID}&redirect_uri={REDIRECT_URI}&state={state}"
     return jsonify({"auth_url": auth_url})
 
 @app.route("/token", methods=["POST"])

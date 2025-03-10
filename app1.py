@@ -1,11 +1,12 @@
+import hashlib
+import base64
+import os
 from flask import Flask, request, jsonify, session
 import requests
 import config
 
 app = Flask(__name__)
-
-# ✅ Add a secret key for session management
-app.secret_key = "your_secret_key_here"  # Change this to a strong, random value
+app.secret_key = "b48dd4cbb56a06cb2e13"  # Change this to a strong, random value
 
 # DigiLocker API Credentials
 CLIENT_ID = config.CLIENT_ID
@@ -13,33 +14,57 @@ CLIENT_SECRET = config.CLIENT_SECRET
 REDIRECT_URI = config.REDIRECT_URI
 BASE_URL = "https://digilocker.meripehchaan.gov.in/public/oauth2"
 
+def generate_code_verifier():
+    """Generate a secure random code_verifier"""
+    return base64.urlsafe_b64encode(os.urandom(32)).decode("utf-8").rstrip("=")
+
+def generate_code_challenge(code_verifier):
+    """Generate code_challenge using SHA256 hashing"""
+    digest = hashlib.sha256(code_verifier.encode("utf-8")).digest()
+    return base64.urlsafe_b64encode(digest).decode("utf-8").rstrip("=")
+
 @app.route("/auth", methods=["GET"])
 def authenticate():
-    """Initiate DigiLocker Authentication."""
-    state = request.args.get("state", "default_state")  # Get state from query params
-    session["state"] = state  # ✅ Store state in session
-    print(session["state"], "=== stored state ===")  # Debugging print
+    """Initiate DigiLocker Authentication with PKCE"""
+    state = request.args.get("state", "default_state")  
+    session["state"] = state  # Store state in session
+
+    # Generate PKCE values
+    code_verifier = generate_code_verifier()
+    code_challenge = generate_code_challenge(code_verifier)
     
-    auth_url = f"{BASE_URL}/authorize?response_type=code&client_id={CLIENT_ID}&redirect_uri={REDIRECT_URI}&state={state}"
+    session["code_verifier"] = code_verifier  # Store code_verifier for later
+
+    auth_url = (
+        f"{BASE_URL}/authorize?"
+        f"response_type=code&client_id={CLIENT_ID}"
+        f"&redirect_uri={REDIRECT_URI}&state={state}"
+        f"&code_challenge={code_challenge}&code_challenge_method=S256"
+    )
+
     return jsonify({"auth_url": auth_url})
-
-
 
 @app.route("/token", methods=["POST"])
 def get_token():
-    """Exchange code for access token."""
+    """Exchange authorization code for access token using PKCE"""
     code = request.json.get("code")
     if not code:
         return jsonify({"error": "Missing authorization code"}), 400
-    
+
+    # Retrieve code_verifier from session
+    code_verifier = session.get("code_verifier")
+    if not code_verifier:
+        return jsonify({"error": "Missing code_verifier"}), 400
+
     data = {
         "grant_type": "authorization_code",
         "code": code,
         "client_id": CLIENT_ID,
         "client_secret": CLIENT_SECRET,
-        "redirect_uri": REDIRECT_URI
+        "redirect_uri": REDIRECT_URI,
+        "code_verifier": code_verifier,  # Include code_verifier for PKCE
     }
-    
+
     response = requests.post(f"{BASE_URL}/token", data=data)
     return jsonify(response.json())
 

@@ -110,24 +110,30 @@ def callback():
 def fetch_documents():
     """Fetch user's documents from DigiLocker."""
     access_token = request.headers.get("Authorization")
+    logging.info(f"Access Token from Headers: {access_token}")
 
     # Try fetching token from session if not found in headers
-    logging.error(f"Error Access Token: {access_token}")
     if not access_token:
         access_token = session.get("access_token")
+        logging.info(f"Access Token from Session: {access_token}")
 
     if not access_token:
+        logging.error("Missing access token")
         return jsonify({"error": "Missing access token"}), 401
 
     headers = {"Authorization": f"Bearer {access_token}"}
     response = requests.get("https://digilocker.gov.in/api/v1/fetch/documents", headers=headers)
-    logging.error(f"Error fetching documents: {response}")
+
     
+    logging.info(f"Response Status Code: {response.status_code}")
+    logging.info(f"Response Content: {response.text}")
+
     if response.status_code != 200:
         logging.error(f"Error fetching documents: {response.text}")
         return jsonify({"error": "Failed to fetch documents"}), response.status_code
 
     return jsonify(response.json())
+
 
 @app.route("/verify-otp", methods=["POST"])
 def verify_otp():

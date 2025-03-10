@@ -11,7 +11,7 @@ app.secret_key = "your_secret_key_here"  # Change this to a strong, random value
 CLIENT_ID = config.CLIENT_ID
 CLIENT_SECRET = config.CLIENT_SECRET
 REDIRECT_URI = config.REDIRECT_URI
-BASE_URL = "https://digilocker.gov.in/public/oauth2"
+BASE_URL = "https://digilocker.meripehchaan.gov.in/public/oauth2"
 
 @app.route("/auth", methods=["GET"])
 def authenticate():

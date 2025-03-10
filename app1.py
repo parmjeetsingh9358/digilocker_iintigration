@@ -110,7 +110,7 @@ def callback():
 def fetch_documents():
     """Fetch user's documents from DigiLocker."""
     access_token = request.headers.get("Authorization")
-    logging.info(f"Access Token from Headers: {access_token}")
+    logging.info(f"Access Token from Headers: {request.headers}")
 
     # Try fetching token from session if not found in headers
     if not access_token:

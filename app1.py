@@ -4,6 +4,9 @@ import config
 
 app = Flask(__name__)
 
+# ✅ Add a secret key for session management
+app.secret_key = "your_secret_key_here"  # Change this to a strong, random value
+
 # DigiLocker API Credentials
 CLIENT_ID = config.CLIENT_ID
 CLIENT_SECRET = config.CLIENT_SECRET
@@ -13,12 +16,13 @@ BASE_URL = "https://digilocker.gov.in/public/oauth2"
 @app.route("/auth", methods=["GET"])
 def authenticate():
     """Initiate DigiLocker Authentication."""
-    state = request.args.get("state", "default_state")
-    session["state"] = state
-    print(session["state"], "=== stored state ===")
-
+    state = request.args.get("state", "default_state")  # Get state from query params
+    session["state"] = state  # ✅ Store state in session
+    print(session["state"], "=== stored state ===")  # Debugging print
+    
     auth_url = f"{BASE_URL}/authorize?response_type=code&client_id={CLIENT_ID}&redirect_uri={REDIRECT_URI}&state={state}"
     return jsonify({"auth_url": auth_url})
+
 
 
 @app.route("/token", methods=["POST"])

@@ -4,6 +4,7 @@ import os
 from flask import Flask, request, jsonify, session
 import requests
 import config
+import logging
 
 app = Flask(__name__)
 app.secret_key = "b48dd4cbb56a06cb2e13"  # Change this to a strong, random value
@@ -13,6 +14,8 @@ CLIENT_ID = config.CLIENT_ID
 CLIENT_SECRET = config.CLIENT_SECRET
 REDIRECT_URI = config.REDIRECT_URI
 BASE_URL = "https://digilocker.meripehchaan.gov.in/public/oauth2"
+
+logging.basicConfig(level=logging.INFO)
 
 def generate_code_verifier():
     """Generate a secure random code_verifier"""
@@ -45,6 +48,7 @@ def authenticate():
         f"&code_challenge_method=S256"
     )
 
+    logging.info(f"Generated Auth URL: {auth_url}")
     return jsonify({"auth_url": auth_url})
 
 

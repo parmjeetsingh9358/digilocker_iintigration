@@ -60,7 +60,6 @@ def get_token():
     if not code:
         return jsonify({"error": "Missing authorization code"}), 400
 
-    # Retrieve code_verifier from session
     code_verifier = session.get("code_verifier")
     if not code_verifier:
         return jsonify({"error": "Missing code_verifier"}), 400
@@ -71,7 +70,7 @@ def get_token():
         "client_id": CLIENT_ID,
         "client_secret": CLIENT_SECRET,
         "redirect_uri": REDIRECT_URI,
-        "code_verifier": code_verifier,  # Include code_verifier for PKCE
+        "code_verifier": code_verifier,
     }
 
     response = requests.post(f"{BASE_URL}/token", data=data)
@@ -80,7 +79,11 @@ def get_token():
         logging.error(f"Error fetching token: {response.text}")
         return jsonify({"error": "Failed to fetch access token"}), response.status_code
 
-    return jsonify(response.json())
+    token_data = response.json()
+    session["access_token"] = token_data.get("access_token")  # Store access token in session
+
+    return jsonify(token_data)
+
 
 @app.route("/callback", methods=["GET"])
 def callback():
@@ -107,11 +110,18 @@ def callback():
 def fetch_documents():
     """Fetch user's documents from DigiLocker."""
     access_token = request.headers.get("Authorization")
+
+    # Try fetching token from session if not found in headers
+    logging.error(f"Error Access Token: {access_token}")
+    if not access_token:
+        access_token = session.get("access_token")
+
     if not access_token:
         return jsonify({"error": "Missing access token"}), 401
-    
+
     headers = {"Authorization": f"Bearer {access_token}"}
     response = requests.get("https://digilocker.gov.in/api/v1/fetch/documents", headers=headers)
+    logging.error(f"Error fetching documents: {response}")
     
     if response.status_code != 200:
         logging.error(f"Error fetching documents: {response.text}")

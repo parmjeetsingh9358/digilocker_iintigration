@@ -46,6 +46,7 @@ def authenticate():
         f"&redirect_uri={REDIRECT_URI}&state={state}"
         f"&code_challenge={code_challenge}"
         f"&code_challenge_method=S256"
+        f"&scope=avs"
     )
 
     logging.info(f"Generated Auth URL: {auth_url}")
@@ -74,6 +75,11 @@ def get_token():
     }
 
     response = requests.post(f"{BASE_URL}/token", data=data)
+    
+    if response.status_code != 200:
+        logging.error(f"Error fetching token: {response.text}")
+        return jsonify({"error": "Failed to fetch access token"}), response.status_code
+
     return jsonify(response.json())
 
 @app.route("/fetch-documents", methods=["GET"])
@@ -85,6 +91,11 @@ def fetch_documents():
     
     headers = {"Authorization": f"Bearer {access_token}"}
     response = requests.get("https://digilocker.gov.in/api/v1/fetch/documents", headers=headers)
+    
+    if response.status_code != 200:
+        logging.error(f"Error fetching documents: {response.text}")
+        return jsonify({"error": "Failed to fetch documents"}), response.status_code
+
     return jsonify(response.json())
 
 @app.route("/verify-otp", methods=["POST"])

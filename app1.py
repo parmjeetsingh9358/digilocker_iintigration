@@ -122,7 +122,7 @@ def fetch_documents():
         return jsonify({"error": "Missing access token"}), 401
 
     headers = {"Authorization": f"Bearer {access_token}"}
-    response = requests.get("https://digilocker.gov.in/api/v1/fetch/documents", headers=headers)
+    response = requests.get(f"{BASE_URL}/documents", headers=headers)
 
     
     logging.info(f"Response Status Code: {response.status_code}")

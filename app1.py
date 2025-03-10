@@ -16,12 +16,14 @@ BASE_URL = "https://digilocker.meripehchaan.gov.in/public/oauth2"
 
 def generate_code_verifier():
     """Generate a secure random code_verifier"""
-    return base64.urlsafe_b64encode(os.urandom(32)).decode("utf-8").rstrip("=")
+    verifier = base64.urlsafe_b64encode(os.urandom(32)).decode("utf-8")
+    return verifier.rstrip("=")
 
 def generate_code_challenge(code_verifier):
     """Generate code_challenge using SHA256 hashing"""
     digest = hashlib.sha256(code_verifier.encode("utf-8")).digest()
-    return base64.urlsafe_b64encode(digest).decode("utf-8").rstrip("=")
+    challenge = base64.urlsafe_b64encode(digest).decode("utf-8")
+    return challenge.rstrip("=")
 
 @app.route("/auth", methods=["GET"])
 def authenticate():
@@ -33,16 +35,18 @@ def authenticate():
     code_verifier = generate_code_verifier()
     code_challenge = generate_code_challenge(code_verifier)
     
-    session["code_verifier"] = code_verifier  # Store code_verifier for later
+    session["code_verifier"] = code_verifier
 
     auth_url = (
         f"{BASE_URL}/authorize?"
         f"response_type=code&client_id={CLIENT_ID}"
         f"&redirect_uri={REDIRECT_URI}&state={state}"
-        f"&code_challenge={code_challenge}&code_challenge_method=S256"
+        f"&code_challenge={code_challenge}"
+        f"&code_challenge_method=S256"
     )
 
     return jsonify({"auth_url": auth_url})
+
 
 @app.route("/token", methods=["POST"])
 def get_token():

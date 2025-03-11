@@ -1,7 +1,7 @@
 import os
 
-CLIENT_ID = "LVA3A4468E"
-CLIENT_SECRET = "a627419383487a5faaff"
+CLIENT_ID = "HMBAEBFEE0"
+CLIENT_SECRET = "b48dd4cbb56a06cb2e03"
 REDIRECT_URI = "https://testing.dpdp-privcy.in.net/callback"
 
 SETU_CLIENT_ID = "HMBAEBFEE0"

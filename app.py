@@ -66,7 +66,7 @@ def login():
     "code_challenge": verifier_data['code_challenge'],
     "code_challenge_method": "S256",
     "state": session["oauth_state"],
-    "scope": "userdetails email careof address avs",
+    "scope": "userdetails email address avs",
     "prompt": "consent"
     }
 

@@ -110,9 +110,8 @@ def callback():
 def fetch_documents():
     """Fetch user's documents from DigiLocker."""
     access_token = request.headers.get("Authorization")
-    logging.info(f"Access Token from Headers: {request.headers}")
+    logging.info(f"Request Headers: {request.headers}")  # Log full headers
 
-    # Try fetching token from session if not found in headers
     if not access_token:
         access_token = session.get("access_token")
         logging.info(f"Access Token from Session: {access_token}")
@@ -124,13 +123,13 @@ def fetch_documents():
     headers = {"Authorization": f"Bearer {access_token}"}
     response = requests.get(f"{BASE_URL}/documents", headers=headers)
 
-    
     logging.info(f"Response Status Code: {response.status_code}")
+    logging.info(f"Response Headers: {response.headers}")
     logging.info(f"Response Content: {response.text}")
 
     if response.status_code != 200:
         logging.error(f"Error fetching documents: {response.text}")
-        return jsonify({"error": "Failed to fetch documents"}), response.status_code
+        return jsonify({"error": "Failed to fetch documents", "details": response.text}), response.status_code
 
     return jsonify(response.json())
 

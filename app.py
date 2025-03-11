@@ -52,7 +52,7 @@ def login():
             "code_challenge": code_challenge,
             "code_challenge_method": "S256",
             "state": session["oauth_state"],
-            "scope": "avs_parent"
+            "scope": "avs_parent userdetails"
         }
     auth_url = f"{AUTH_ENDPOINT}?{urllib.parse.urlencode(params)}"
     print(f"Redirecting to Authorization URL: {auth_url}")

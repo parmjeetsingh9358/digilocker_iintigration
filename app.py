@@ -60,16 +60,16 @@ def login():
     session["oauth_state"] = secrets.token_hex(16)  
 
     params = {
-        "client_id": CLIENT_ID,
-        "response_type": "code",
-        "redirect_uri": REDIRECT_URI,
-        "code_challenge": verifier_data['code_challenge'],
-        "code_challenge_method": "S256",
-        "state": session["oauth_state"],
-        "scope": "userdetails email careof address avs",
-        "prompt": "consent"
-
+    "client_id": CLIENT_ID,
+    "response_type": "code",
+    "redirect_uri": REDIRECT_URI,
+    "code_challenge": verifier_data['code_challenge'],
+    "code_challenge_method": "S256",
+    "state": session["oauth_state"],
+    "scope": "userdetails email careof address avs files.issueddocs files.uploadeddocs",
+    "prompt": "consent"
     }
+
     auth_url = f"{AUTH_ENDPOINT}?{urllib.parse.urlencode(params)}"
     return redirect(auth_url)
 

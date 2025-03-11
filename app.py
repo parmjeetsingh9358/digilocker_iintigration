@@ -66,7 +66,9 @@ def login():
         "code_challenge": verifier_data['code_challenge'],
         "code_challenge_method": "S256",
         "state": session["oauth_state"],
-        "scope": "userdetails email careof address avs icjsroles apaardetails"
+        "scope": "userdetails email careof address avs",
+        "prompt": "consent"
+
     }
     auth_url = f"{AUTH_ENDPOINT}?{urllib.parse.urlencode(params)}"
     return redirect(auth_url)

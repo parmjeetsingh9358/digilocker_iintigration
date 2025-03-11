@@ -106,7 +106,9 @@ def callback():
 def fetch_user_info(access_token):
     """Fetch user details from DigiLocker using access token"""
     headers = {"Authorization": f"Bearer {access_token}", "Accept": "application/json"}
+    print(f"headers: {headers}")
     response = requests.get(USER_INFO_URL, headers=headers)
+    print(f"user_info: {response.text}")
     return response.json() if response.status_code == 200 else {"error": response.text}
 
 @app.route('/fetch-docs')

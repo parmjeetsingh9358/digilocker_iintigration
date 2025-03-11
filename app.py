@@ -50,7 +50,7 @@ def login():
             "response_type": "code",
             "redirect_uri": REDIRECT_URI,
             "code_challenge": code_challenge,
-            "code_challenge_method": "S256 (SHA256)",
+            "code_challenge_method": "S256",
             "state": session["oauth_state"],
             "scope": "avs_parent userdetails"
         }

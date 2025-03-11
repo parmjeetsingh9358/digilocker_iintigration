@@ -37,7 +37,7 @@ def home():
 def login():
     """Step 1: Redirect User to DigiLocker for Authentication"""
 
-    code_verifier = secrets.token_urlsafe(64)
+    code_verifier = secrets.token_urlsafe(96)
     code_challenge = base64.urlsafe_b64encode(
         hashlib.sha256(code_verifier.encode()).digest()
     ).decode().rstrip("=")
@@ -50,7 +50,7 @@ def login():
             "response_type": "code",
             "redirect_uri": REDIRECT_URI,
             "code_challenge": code_challenge,
-            "code_challenge_method": "S256",
+            "code_challenge_method": "S256 (SHA256)",
             "state": session["oauth_state"],
             "scope": "avs_parent userdetails"
         }

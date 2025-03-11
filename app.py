@@ -58,7 +58,7 @@ def login():
     verifier_data = generate_code_challenge_verifier(96, 'S256')
     session["code_verifier"] = verifier_data['code_verifier']
     session["oauth_state"] = secrets.token_hex(16)  
-    
+
     params = {
         "client_id": CLIENT_ID,
         "response_type": "code",
@@ -69,15 +69,11 @@ def login():
         "scope": "userdetails avs"
     }
     auth_url = f"{AUTH_ENDPOINT}?{urllib.parse.urlencode(params)}"
-    print(f"Redirecting to Authorization URL: {auth_url}")
-
     return redirect(auth_url)
 
 @app.route('/callback')
 def callback():
     """Step 2: Handle Callback and Exchange Authorization Code for Access Token"""
-    print(f"Callback URL: {request.url}")
-
     auth_code = request.args.get("code")
     received_state = request.args.get("state")
 
@@ -98,10 +94,18 @@ def callback():
     if response.status_code == 200:
         token_info = response.json()
         session.update(token_info)
+
+        print(f"🔹 Granted Scopes: {token_info.get('scope')}")
+
         user_data = fetch_user_info(session["access_token"])
-        return jsonify({"session_data": dict(session), "token_info": token_info, "user_info": user_data})
+        return jsonify({
+            "session_data": dict(session),
+            "token_info": token_info,
+            "user_info": user_data
+        })
     else:
         return f"❌ Error: {response.text}", response.status_code
+
 
 def fetch_user_info(access_token):
     """Fetch user details from DigiLocker using access token"""

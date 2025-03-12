@@ -66,7 +66,8 @@ def login():
     "code_challenge": verifier_data['code_challenge'],
     "code_challenge_method": "S256",
     "state": session["oauth_state"],
-    "prompt": "consent"
+    "prompt": "consent",
+    "scope": "avs avs_parent"
     }
 
     auth_url = f"{AUTH_ENDPOINT}?{urllib.parse.urlencode(params)}"

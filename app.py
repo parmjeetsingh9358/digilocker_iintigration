@@ -102,8 +102,6 @@ def callback():
         print(f"🔹 Granted Scopes: {token_info.get('scope')}")
 
         user_data = fetch_user_info(session["access_token"])
-        fetch_documents = fetch_documents(session["access_token"])
-        print(f"fetch_documents: {fetch_documents}")
         return jsonify({
             "session_data": dict(session),
             "token_info": token_info,
@@ -128,11 +126,10 @@ def fetch_user_info(access_token):
     print(f"user_info: {response.text}")
     return response.json() if response.status_code == 200 else {"error": response.text}
 
-# @app.route('/fetch-docs')
-def fetch_documents(access_token):
+@app.route('/fetch-docs')
+def fetch_documents():
     """Fetch user documents from DigiLocker"""
     access_token = session.get("access_token")
-    print(f"access_token: {access_token}")
     if not access_token:
         return "Unauthorized! Please login first.", 401
 

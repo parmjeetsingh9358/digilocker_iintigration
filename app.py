@@ -66,7 +66,7 @@ def login():
     "code_challenge": verifier_data['code_challenge'],
     "code_challenge_method": "S256",
     "state": session["oauth_state"],
-    "scope": "userdetails email address avs",
+    "scope": "openid profile email",
     "prompt": "consent"
     }
 
@@ -113,6 +113,13 @@ def fetch_user_info(access_token):
     """Fetch user details from DigiLocker using access token"""
     headers = {"Authorization": f"Bearer {access_token}", "Accept": "application/json"}
     print(f"headers: {headers}")
+
+    headers = {
+        'Content-Type': 'application/json',
+        'Accept': 'application/json',
+        'Authorization': f"Bearer {access_token}"
+    }
+    
     response = requests.get(USER_INFO_URL, headers=headers)
     print(f"user_info: {response.text}")
     return response.json() if response.status_code == 200 else {"error": response.text}

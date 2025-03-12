@@ -66,7 +66,7 @@ def login():
     "code_challenge": verifier_data['code_challenge'],
     "code_challenge_method": "S256",
     "state": session["oauth_state"],
-    "defaultScopes": ['read_user','api','read_api','avs_parent'],
+    "defaultScopes": ['avs_parent'],
     "prompt": "consent"
     }
 

@@ -67,11 +67,13 @@ def login():
     "code_challenge_method": "S256",
     "state": session["oauth_state"],
     "prompt": "consent",
-    "scope": "avs avs_parent"
+    "scope": "avs"
     }
 
     auth_url = f"{AUTH_ENDPOINT}?{urllib.parse.urlencode(params)}"
+    print(f"Generated Auth URL: {auth_url}")
     return redirect(auth_url)
+
 
 @app.route('/callback')
 def callback():

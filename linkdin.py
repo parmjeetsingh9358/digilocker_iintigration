@@ -8,6 +8,10 @@ CLIENT_SECRET = 'WPL_AP1.qvN6Z6WXd7rc9UD2.np8QRg=='
 REDIRECT_URI = 'https://testing.dpdp-privcy.in.net/callback'  # Ensure this is exactly the same as in LinkedIn app settings
 
 @app.route('/')
+def home():
+    return "Linkdin OAuth"
+
+
 def login():
     auth_url = (
         "https://www.linkedin.com/oauth/v2/authorization"

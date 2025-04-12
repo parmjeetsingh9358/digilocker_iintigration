@@ -3,12 +3,10 @@ import requests
 
 app = Flask(__name__)
 
-# Replace with your actual LinkedIn App credentials
 CLIENT_ID = '86ufub8dc5p65z'
 CLIENT_SECRET = 'WPL_AP1.qvN6Z6WXd7rc9UD2.np8QRg=='
-REDIRECT_URI = 'https://testing.dpdp-privcy.in.net/callback'  # Must match LinkedIn app exactly
+REDIRECT_URI = 'https://testing.dpdp-privcy.in.net/callback'  # Ensure this is exactly the same as in LinkedIn app settings
 
-# Step 1: Redirect user to LinkedIn Auth URL
 @app.route('/')
 def login():
     auth_url = (
@@ -20,14 +18,12 @@ def login():
     )
     return redirect(auth_url)
 
-# Step 2: LinkedIn redirects to this route with "code"
 @app.route('/callback')
 def callback():
     auth_code = request.args.get('code')
     if not auth_code:
         return 'No auth code received', 400
 
-    # Step 3: Exchange auth code for access token
     token_url = 'https://www.linkedin.com/oauth/v2/accessToken'
     data = {
         'grant_type': 'authorization_code',
@@ -41,10 +37,8 @@ def callback():
     token_data = response.json()
 
     if 'access_token' in token_data:
-        access_token = token_data['access_token']
-        return f'✅ Access Token: {access_token}'
-    else:
-        return f'❌ Error: {token_data}', 400
+        return f"Access Token: {token_data['access_token']}"
+    return f"Error: {token_data}", 400
 
 if __name__ == '__main__':
     app.run(debug=True)

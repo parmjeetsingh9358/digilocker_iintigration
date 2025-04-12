@@ -28,6 +28,7 @@ def callback():
 
     # Step 3: Exchange auth code for access token
     token_url = 'https://www.linkedin.com/oauth/v2/accessToken'
+    print(token_url, "========token_url =========")
     data = {
         'grant_type': 'authorization_code',
         'code': auth_code,
@@ -35,9 +36,10 @@ def callback():
         'client_id': CLIENT_ID,
         'client_secret': CLIENT_SECRET,
     }
-
+    print(data, "======data======")
     response = requests.post(token_url, data=data)
     token_data = response.json()
+    print(token_data, "==================")
 
     if 'access_token' in token_data:
         access_token = token_data['access_token']

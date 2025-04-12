@@ -5,7 +5,7 @@ app = Flask(__name__)
 
 CLIENT_ID = '86ufub8dc5p65z'
 CLIENT_SECRET = 'WPL_AP1.qvN6Z6WXd7rc9UD2.np8QRg=='
-REDIRECT_URI = 'https://testing.dpdp-privcy.in.net/callback"'
+REDIRECT_URI = 'https://testing.dpdp-privcy.in.net/callback'
 
 # Step 1: Redirect user to LinkedIn Auth URL
 @app.route('/')

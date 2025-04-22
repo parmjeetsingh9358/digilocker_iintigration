@@ -138,4 +138,4 @@ def fetch_documents():
     return jsonify(response.json()) if response.status_code == 200 else ("Error Fetching Documents", response.status_code)
 
 if __name__ == '__main__':
-    app.run(debug=True, host="localhost", port=5000)
+    app.run(debug=True, host="localhost", port=80)
